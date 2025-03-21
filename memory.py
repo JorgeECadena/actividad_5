@@ -64,9 +64,14 @@ def draw():
         write(tiles[mark], font=('Arial', 30, 'normal'))
 
         up()
-    goto(-180, 180)  # Position at the top-left corner
+    goto(-180, 180)
     color('black')
     write(f"Taps: {tap_count}", font=('Arial', 16, 'bold'))
+
+    if all(not hidden for hidden in hide):
+        goto(-50, 0)
+        color('green')
+        write("You Win!", font=('Arial', 24, 'bold'))
 
     update()
     ontimer(draw, 100)
