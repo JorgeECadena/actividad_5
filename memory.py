@@ -3,17 +3,32 @@ from turtle import *
 from freegames import path
 
 car = path('car.gif')
-tiles = list(range(32)) * 2
+colors = [(randrange(256), randrange(256), randrange(256)) for _ in range(32)]
+tiles = colors * 2
 state = {'mark': None}
 hide = [True] * 64
 tap_count = 0
 
-def square(x, y):
+colormode(255)
+shuffle(tiles)
+
+def rgb_to_hex(rgb):
+    """Convert (R, G, B) tuple to hex format for Turtle."""
+    return "#{:02x}{:02x}{:02x}".format(rgb[0], rgb[1], rgb[2])
+
+def square(x, y, fill_color=None):
     "Draw white square with black outline at (x, y)."
     up()
     goto(x, y)
     down()
-    color('black', 'white')
+
+    if fill_color:
+        fill_hex = rgb_to_hex(fill_color)
+        color("black", fill_hex)
+    else:
+        color("black", "white")
+
+
     begin_fill()
     for count in range(4):
         forward(50)
@@ -50,20 +65,20 @@ def draw():
     stamp()
 
     for count in range(64):
+        x, y = xy(count)
+
         if hide[count]:
-            x, y = xy(count)
             square(x, y)
+        elif state['mark'] == count:
+            square(x, y, tiles[count])
 
     mark = state['mark']
 
     if mark is not None and hide[mark]:
         x, y = xy(mark)
-        up()
-        goto(x + 2, y)
-        color('black')
-        write(tiles[mark], font=('Arial', 30, 'normal'))
+        square(x, y, tiles[mark])
 
-        up()
+    up()
     goto(-180, 180)
     color('black')
     write(f"Taps: {tap_count}", font=('Arial', 16, 'bold'))
@@ -76,7 +91,6 @@ def draw():
     update()
     ontimer(draw, 100)
 
-shuffle(tiles)
 setup(420, 420, 370, 0)
 addshape(car)
 hideturtle()
