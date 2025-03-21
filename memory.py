@@ -4,10 +4,10 @@ from freegames import path
 
 car = path('car.gif')
 colors = [(randrange(256), randrange(256), randrange(256)) for _ in range(32)]
-#tiles = list(range(32)) * 2
 tiles = colors * 2
 state = {'mark': None}
 hide = [True] * 64
+tap_count = 0
 
 colormode(255)
 shuffle(tiles)
@@ -45,6 +45,7 @@ def xy(count):
 
 def tap(x, y):
     "Update mark and hidden tiles based on tap."
+    global tap_count
     spot = index(x, y)
     mark = state['mark']
 
@@ -54,6 +55,7 @@ def tap(x, y):
         hide[spot] = False
         hide[mark] = False
         state['mark'] = None
+    tap_count = tap_count + 1
 
 def draw():
     "Draw image and tiles."
@@ -75,6 +77,17 @@ def draw():
     if mark is not None and hide[mark]:
         x, y = xy(mark)
         square(x, y, tiles[mark])
+
+    up()
+    goto(-180, 180)
+    color('black')
+    write(f"Taps: {tap_count}", font=('Arial', 16, 'bold'))
+
+    if all(not hidden for hidden in hide):
+        goto(-50, 0)
+        color('green')
+        write("You Win!", font=('Arial', 24, 'bold'))
+
     update()
     ontimer(draw, 100)
 
